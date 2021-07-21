@@ -24,6 +24,7 @@ class GalleryAdapter(private val context : Context) : RecyclerView.Adapter<Galle
         fun bind(item : Uri){
             Glide.with(itemView.context)
                 .load(item)
+                    .error(R.drawable.error)
                 .into(binding.imageView)
         }
     }
