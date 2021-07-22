@@ -22,15 +22,16 @@ class MainActivity : AppCompatActivity() {
         LoadImage()
     }
     fun LoadImage(){
-        val query = contentResolver.query(
+        contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
                 null,
                 null,
                 null
-        )
-        query?.use{cursor ->
-            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+        )?.use{cursor ->
+            if(cursor==null) Log.d("ifnull",cursor.toString())
+            else Log.d("nonifnull",cursor.count.toString())
+            val idColumn = cursor.getColumnIndex(MediaStore.Images.Media._ID)
             while(cursor.moveToNext()){
                 Log.d("test",cursor.count.toString())
                 val id = cursor.getLong(idColumn)
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity() {
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                         id
                 )
-                Log.d("uri", "uri : $contentUri")
+                Log.d("abc", "uri : $contentUri")
                 adapter.addItem(contentUri)
             }
         }
