@@ -1,27 +1,34 @@
 package com.example.gallery
 
+import android.Manifest
 import android.content.ContentUris
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import com.example.gallery.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private var adapter = GalleryAdapter(this)
-    val projection = arrayOf(
+    private val projection = arrayOf(
         MediaStore.Images.Media._ID
     )
+    private val storagePermissionContract = registerForActivityResult(ActivityResultContracts.RequestPermission()){
+        if(it) loadImage()
+        else Toast.makeText(this,R.string.non_permission,Toast.LENGTH_SHORT)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.recyclerView.adapter = adapter
-        LoadImage()
+        storagePermissionContract.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
-    fun LoadImage(){
+    private fun loadImage(){
         contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
@@ -29,11 +36,8 @@ class MainActivity : AppCompatActivity() {
                 null,
                 null
         )?.use{cursor ->
-            if(cursor==null) Log.d("ifnull",cursor.toString())
-            else Log.d("nonifnull",cursor.count.toString())
             val idColumn = cursor.getColumnIndex(MediaStore.Images.Media._ID)
             while(cursor.moveToNext()){
-                Log.d("test",cursor.count.toString())
                 val id = cursor.getLong(idColumn)
                 val contentUri : Uri = ContentUris.withAppendedId(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,

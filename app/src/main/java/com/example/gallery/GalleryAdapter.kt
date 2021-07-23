@@ -24,12 +24,14 @@ class GalleryAdapter(private val context : Context) : RecyclerView.Adapter<Galle
         fun bind(item : Uri){
             Glide.with(itemView.context)
                 .load(item)
-                    .error(R.drawable.error)
+                .override(200)
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.error)
                 .into(binding.imageView)
         }
     }
     fun addItem(item : Uri){
         datas.add(item)
-        notifyDataSetChanged()
+        notifyItemInserted(itemCount - 1)
     }
 }
